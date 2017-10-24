@@ -1,0 +1,10 @@
+DROP DATABASE IF EXISTS stocky;
+
+CREATE DATABASE stocky;
+
+USE stocky;
+
+CREATE TABLE users (
+  id int NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (id)
+);
