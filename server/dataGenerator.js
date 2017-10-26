@@ -24,6 +24,11 @@ const majorPair = [
     'GBPJPY',
 ]
 
+var userid =  faker.random.number();
+var views = faker.random.number(50);
+var sessions = faker.random.number({min:50, max:100});
+var average = views/sessions;
+
 var myNamespace = {};
 
 myNamespace.round = function(number, precision) {
@@ -33,31 +38,28 @@ myNamespace.round = function(number, precision) {
     return roundedTempNumber / factor;
 };
 
-var userid =  faker.random.number();
-var views = faker.random.number(50);
-var sessions = faker.random.number({min:50, max:100});
-var average = views/sessions;
-
-var user = {
-    id: userid,
-    totalSessions: sessions,
-};
-
-var indicators = {
-    user_id: userid,
-    indicator: indicator[Math.floor(Math.random() * indicator.length)],
-    totalViews: views,
-    average: myNamespace.round(average, 2),
-};
-
-var profits = {
-    user_id: userid,
-    currencyPair: majorPair[Math.floor(Math.random() * majorPair.length)],
-    profitNumber: faker.random.number({min:10, max:10000000000000}),
-};
+var packet = {
+    user: {
+        id: userid,
+        totalSessions: sessions,
+    },
+    indicators: {
+        user_id: userid,
+        indicator: indicator[Math.floor(Math.random() * indicator.length)],
+        totalViews: views,
+        average: myNamespace.round(average, 2),
+    },
+    profits: {
+        user_id: userid,
+        currencyPair: majorPair[Math.floor(Math.random() * majorPair.length)],
+        profitNumber: faker.random.number({min:10, max:10000000000000}),
+    },
+}
 
 
-console.log(user);
-console.log(indicators)
-console.log(profits);
+
+console.log(packet)
+// console.log(user);
+// console.log(indicators)
+// console.log(profits);
 
