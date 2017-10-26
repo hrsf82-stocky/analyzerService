@@ -21,6 +21,7 @@
     "jquery": "^3.2.1",
     "mocker-data-generator": "^2.4.9",
     "mysql": "^2.14.1",
+    "probability-distributions": "^0.9.1",
     "shortid": "^2.2.8"
   }
 }

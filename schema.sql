@@ -6,6 +6,8 @@ USE stocky;
 
 CREATE TABLE users (
   id int NOT NULL AUTO_INCREMENT,
+  user int NOT NULL,
+  totalSessions int NOT NULL,
   PRIMARY KEY (ID)
 );
 
@@ -16,7 +18,6 @@ CREATE TABLE indicators (
     totalViews int NOT NULL, 
     average int NOT NULL, 
     PRIMARY KEY (ID)
-
 );
 
 CREATE TABLE profits (

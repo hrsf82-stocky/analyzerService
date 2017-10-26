@@ -1,6 +1,7 @@
-var mocker = require('mocker-data-generator').default;
+const mocker = require('mocker-data-generator').default;
 const database = require('../database/index.js');
-var faker = require('faker');
+const faker = require('faker');
+const PD = require("probability-distributions");
 
 
 const shortid = require('shortid');
@@ -24,42 +25,50 @@ const majorPair = [
     'GBPJPY',
 ]
 
-var userid =  faker.random.number();
-var views = faker.random.number(50);
-var sessions = faker.random.number({min:50, max:100});
-var average = views/sessions;
+let userid =  faker.random.number(99999999);
+let views = faker.random.number(500);
+let sessions = faker.random.number({min:50, max:1000});
+let average = views/sessions;
+let array = PD.rchisq(100, 100);
 
-var myNamespace = {};
+let myNamespace = {};
 
 myNamespace.round = function(number, precision) {
-    var factor = Math.pow(10, precision);
-    var tempNumber = number * factor;
-    var roundedTempNumber = Math.round(tempNumber);
+    let factor = Math.pow(10, precision);
+    let tempNumber = number * factor;
+    let roundedTempNumber = Math.round(tempNumber);
     return roundedTempNumber / factor;
 };
 
-var packet = {
-    user: {
+let packet = function() {
+    let packet = {}
+    packet.user = {
         id: userid,
         totalSessions: sessions,
-    },
-    indicators: {
+    }
+    packet.indicators = {
         user_id: userid,
         indicator: indicator[Math.floor(Math.random() * indicator.length)],
         totalViews: views,
         average: myNamespace.round(average, 2),
-    },
-    profits: {
+    }
+    packet.profits = {
         user_id: userid,
         currencyPair: majorPair[Math.floor(Math.random() * majorPair.length)],
-        profitNumber: faker.random.number({min:10, max:10000000000000}),
-    },
+        profitNumber: array[Math.floor(Math.random() * array.length)],
+    }
+    return packet;
 }
 
+// let newPacket = packet()
+// database.chunk(newPacket);
+// database.insertFakeData(newPacket)
 
-
-console.log(packet)
+// console.log(packet)
 // console.log(user);
 // console.log(indicators)
 // console.log(profits);
+
+
+
 
