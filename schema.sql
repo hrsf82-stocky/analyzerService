@@ -24,7 +24,7 @@
         user_id INTEGER NOT NULL,
         indicator varchar(100) NOT NULL,
         totalViews INTEGER NOT NULL,
-        average INTEGER NOT NULL,
+        average FLOAT NOT NULL,
         PRIMARY KEY (id)
     );
 
@@ -38,6 +38,6 @@
         id INTEGER NOT NULL DEFAULT NEXTVAL ('Profits_seq'),
         user_id INTEGER NOT NULL,
         currencyPair varchar(100) NOT NULL,
-        profitNumber INTEGER NOT NULL,
+        profitNumber FLOAT NOT NULL,
         PRIMARY KEY (id)
     );
