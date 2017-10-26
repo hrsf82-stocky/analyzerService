@@ -7,9 +7,9 @@ const PD = require("probability-distributions");
 const shortid = require('shortid');
 
 const indicator = [
-    'macd',
-    'ema',
-    'movingAvg'
+    'MACD',
+    'EMA',
+    'MA'
 ];
 
 const majorPair = [

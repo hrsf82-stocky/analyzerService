@@ -1,29 +1,43 @@
-DROP DATABASE IF EXISTS stocky;
 
-CREATE DATABASE stocky;
+    DROP TABLE IF EXISTS MyUsers;
 
-USE stocky;
+    DROP SEQUENCE IF EXISTS MyUsers_seq;
+    CREATE SEQUENCE MyUsers_seq;
 
-CREATE TABLE users (
-  id int NOT NULL AUTO_INCREMENT,
-  user int NOT NULL,
-  totalSessions int NOT NULL,
-  PRIMARY KEY (ID)
-);
+    CREATE TABLE MyUsers
+    (
+        id INTEGER NOT NULL DEFAULT NEXTVAL ('MyUsers_seq'),
+        user_id INTEGER NOT NULL,
+        totalSessions INTEGER NOT NULL,
+        PRIMARY KEY (id)
+    );
 
-CREATE TABLE indicators (
-    id int NOT NULL AUTO_INCREMENT,
-    user_id int NOT NULL,
-    indicator varchar(100) NOT NULL,
-    totalViews int NOT NULL, 
-    average int NOT NULL, 
-    PRIMARY KEY (ID)
-);
 
-CREATE TABLE profits (
-    id int NOT NULL AUTO_INCREMENT,
-    user_id int NOT NULL,
-    currencyPair varchar(100) NOT NULL,
-    profitNumber int NOT NULL,
-    PRIMARY KEY (ID)
-);
+    DROP TABLE IF EXISTS Indicators;
+
+    DROP SEQUENCE IF EXISTS Indicators_seq;
+    CREATE SEQUENCE Indicators_seq;
+
+    CREATE TABLE Indicators
+    (
+        id INTEGER NOT NULL DEFAULT NEXTVAL ('Indicators_seq'),
+        user_id INTEGER NOT NULL,
+        indicator varchar(100) NOT NULL,
+        totalViews INTEGER NOT NULL,
+        average INTEGER NOT NULL,
+        PRIMARY KEY (id)
+    );
+
+    DROP TABLE IF EXISTS Profits;
+
+    DROP SEQUENCE IF EXISTS Profits_seq;
+    CREATE SEQUENCE Profits_seq;
+
+    CREATE TABLE Profits
+    (
+        id INTEGER NOT NULL DEFAULT NEXTVAL ('Profits_seq'),
+        user_id INTEGER NOT NULL,
+        currencyPair varchar(100) NOT NULL,
+        profitNumber INTEGER NOT NULL,
+        PRIMARY KEY (id)
+    );
