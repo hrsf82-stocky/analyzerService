@@ -1,71 +1,64 @@
-const mysql = require('mysql');
-const mysqlConfig = require('./config.js');
-const connection = mysql.createConnection(mysqlConfig);
+const pg = require('pg');
 
-var chunk = function (array) {
-    var sets = [];
-    var array = this.length / 1;
-    
-    for (var i = 0, j = 0; i < array; i++, j += 1) {
-      sets[i] = this.slice(j, j + 1);
-    }
-    
-    return console.log(sets);
-};
+// =======================================================
+// ***************** CONNECT TO POSTGRESQL ***************
+// =======================================================
 
-var insertFakeData = (packet) => {
-    for (var key in packet) {
-        if (key === 'user') {
-            for (var index in packet[key]) {
-                // console.log("INDEX: ", index)
-                // console.log("VALUE: ", packet[key][index]);
-                var idValue;
-                var totalSessionsValue;
-                if (index === 'id') {
-                    idValue = packet[key][index];
-                    console.log("ID: ", idValue)
-                }
-                if (index === 'totalSessions') {
-                    totalSessionsValue= packet[key][index];
-                    console.log("SESSSSSH: ", totalSessionsValue)
-                }
+let config = {};
 
-                var queryString = 'insert into users (user, totalSessions) values (?, ?)';
-                connection.query(queryString, [idValue, totalSessionsValue], (err, results) => {
-                  if (err) {
-                    console.error('reached ERROR', err);
-                  } else {
-                    console.log('Success!')
-                  }
-                });
-            }
-        }
-        if (key === 'indicators') {
-            // console.log(key)
-            
-        }
-        if (key === 'profits') {
-            // console.log(key)
-            
-        }
-    }
+if (process.env.DATABASE_URL) {
+  config.connectionString = process.env.DATABASE_URL;
+} else {
+  config.user = 'stephaniewong';
+  config.password = '';
+  config.database = 'stocky';
 }
 
-module.exports.insertFakeData = insertFakeData;
-module.exports.chunk = chunk;
+let pool = new pg.Pool(config)
+pool.connect();
 
-// var queryString = 'insert into collections (user_id, book_id) values (?, ?)';
-// connection.query(queryString, [userId, bookId], (err, results) => {
-//   if (err) {
-//     console.log('reached here');
-//     callback(err, null);
-//   } else {
-//     getCollectionByUserId(userId, (err, finalResult) => {
-//       if (err) {
-//         callback(err, null);
-//       } else {
-//       callback(finalResult, null);
-//       }
-//     })
-//   }
-// });
+
+// =======================================================
+// ************** INSERT DATA PACKET QUERIES *************
+// =======================================================
+
+
+let insertUserPacket = (packet) => {
+    let queryString = 'INSERT INTO MyUsers (user_id, totalSessions) VALUES ($1, $2)';
+    let values = [packet.user.user_id, packet.user.totalSessions];
+    pool.query(queryString, values, (err, results) => {
+        if (err) {
+        console.error('ERROR', err);
+        } else {
+        console.log('Success!!!', results)
+        }
+    });
+}
+
+let insertIndicatorPacket = (packet) => {
+    let queryString = 'INSERT INTO Indicators (user_id, indicator, totalViews, average) VALUES ($1, $2, $3, $4)';
+    let values = [packet.indicators.user_id, packet.indicators.indicator, packet.indicators.totalViews, packet.indicators.average]
+    pool.query(queryString, values, (err, results) => {
+        if (err) {
+        console.error('ERROR', err);
+        } else {
+        console.log('Success!!!', results)
+        }
+    });
+}
+
+let insertProfitPacket = (packet) => {
+    let queryString = 'INSERT INTO Profits (user_id, currencyPair, profitNumber) VALUES ($1, $2, $3)';
+    let values = [packet.profits.user_id, packet.profits.currencyPair, packet.profits.profitNumber]
+    pool.query(queryString, values, (err, results) => {
+        if (err) {
+        console.error('ERROR', err);
+        } else {
+        console.log('Success!!!', results)
+        }
+    });   
+}
+
+module.exports.insertUserPacket = insertUserPacket;
+module.exports.insertIndicatorPacket = insertIndicatorPacket;
+module.exports.insertProfitPacket = insertProfitPacket;
