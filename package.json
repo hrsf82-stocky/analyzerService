@@ -17,7 +17,10 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
+    "faker": "^4.1.0",
     "jquery": "^3.2.1",
-    "mysql": "^2.14.1"
+    "mocker-data-generator": "^2.4.9",
+    "mysql": "^2.14.1",
+    "shortid": "^2.2.8"
   }
 }
