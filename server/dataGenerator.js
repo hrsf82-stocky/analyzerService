@@ -14,11 +14,17 @@ const majorPair = [
     'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY',
     'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY', ];
 
-let userid =  faker.random.number(99999999);
-let views = faker.random.number(500);
-let sessions = faker.random.number({min:50, max:1000});
-let average = views/sessions;
-let array = PD.rchisq(100, 100);
+
+let makeRandom = () => {
+    let packet = {};
+    packet.user_id =  faker.random.number({min:10000000, max:99999999});
+    packet.views = faker.random.number(500);
+    packet.sessions = faker.random.number({min:50, max:1000});
+    packet.average = packet.views/packet.sessions;
+    packet.array = PD.rchisq(100, 100);
+    return packet;
+}
+
 let myNamespace = {};
 
 // Helper function round numbers to desired decimal points
@@ -34,48 +40,50 @@ myNamespace.round = function(number, precision) {
 // **************** GENERATE DATA PACKETS ***************
 // ====================================================== 
 
-let userPacket = () => {
+let userPacket = (data) => {
     let packet = {}
     packet.user = {
-        user_id: userid,
-        totalSessions: sessions,
+        user_id: data.user_id,
+        totalSessions: data.sessions,
     }
     return packet;
 }
 
-let indicatorPacket = () => {
+let indicatorPacket = (data) => {
     let packet = {}
     packet.indicators = {
-        user_id: userid,
+        user_id: data.user_id,
         indicator: indicator[Math.floor(
             Math.random() * indicator.length)],
-        totalViews: views,
-        average: myNamespace.round(average, 2),
+        totalViews: data.views,
+        average: myNamespace.round(data.average, 2),
     }
     return packet;
 }
 
-let profitPacket = () => {
+let profitPacket = (data) => {
     let packet = {}
     packet.profits = {
-        user_id: userid,
+        user_id: data.user_id,
         currencyPair: majorPair[Math.floor(
             Math.random() * majorPair.length)],
-        profitNumber: array[Math.floor(
-            Math.random() * array.length)],
+        profitNumber: data.array[Math.floor(
+            Math.random() * data.array.length)],
     }
     return packet;  
 }
 
-// Instantiate the new data packets
-let newUser = userPacket();
-let newIndicator = indicatorPacket();
-let newProfit = profitPacket();
-
 // Run the database function to insert new data
-database.insertUserPacket(newUser);
-database.insertIndicatorPacket(newIndicator);
-database.insertProfitPacket(newProfit);
+// var generateData = () => {
+//     for (var i = 0; i <= 10000; i ++) {
+//         var data = makeRandom();
+//         database.insertUserPacket(userPacket(data));
+//         database.insertIndicatorPacket(indicatorPacket(data));
+//         database.insertProfitPacket(profitPacket(data));
+//     }
+// }
+
+// generateData()
 
 
 
