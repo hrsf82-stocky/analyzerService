@@ -30,7 +30,7 @@ let insertUserPacket = (packet) => {
         if (err) {
         console.error('ERROR', err);
         } else {
-        console.log('Success!!!', results)
+        console.log('Success!!!')
         }
     });
 }
@@ -42,7 +42,7 @@ let insertIndicatorPacket = (packet) => {
         if (err) {
         console.error('ERROR', err);
         } else {
-        console.log('Success!!!', results)
+        console.log('Success!!!')
         }
     });
 }
@@ -54,7 +54,7 @@ let insertProfitPacket = (packet) => {
         if (err) {
         console.error('ERROR', err);
         } else {
-        console.log('Success!!!', results)
+        console.log('Success!!!')
         }
     });   
 }
