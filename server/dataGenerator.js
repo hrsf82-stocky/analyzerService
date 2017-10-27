@@ -1,6 +1,7 @@
 const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
+var Promise = require('bluebird');
 
 
 // ====================================================== 
@@ -13,14 +14,13 @@ const majorPair = [
     'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY',
     'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY', ];
 
-
-let makeRandom = () => {
+let makeRandom = (data) => {
     let packet = {};
     packet.user_id =  faker.random.number({min:10000000, max:99999999});
     packet.views = faker.random.number(500);
     packet.sessions = faker.random.number({min:50, max:1000});
     packet.average = packet.views/packet.sessions;
-    packet.array = PD.rchisq(100, 100);
+    packet.array = data;
     return packet;
 }
 
@@ -33,7 +33,6 @@ myNamespace.round = function(number, precision) {
     let roundedTempNumber = Math.round(tempNumber);
     return roundedTempNumber / factor;
 };
-
 
 // ====================================================== 
 // **************** GENERATE DATA PACKETS ***************
@@ -60,30 +59,31 @@ let indicatorPacket = (data) => {
     return packet;
 }
 
-let profitPacket = (data) => {
+let profitPacket = (data, array) => {
     let packet = {}
     packet.profits = {
         user_id: data.user_id,
         currencyPair: majorPair[Math.floor(
             Math.random() * majorPair.length)],
-        profitNumber: data.array[Math.floor(
-            Math.random() * data.array.length)],
+        profitNumber: array.pop(),
     }
     return packet;  
 }
 
-// Run the database function to insert new data
 var generateData = () => {
-    for (var i = 0; i <= 10; i ++) {
-        var data = makeRandom();
+    array = PD.rchisq(100000, 100);
+
+    for (var i = 0; i <= 90000; i ++) {
+        var data = makeRandom(array);
         database.insertUserPacket(userPacket(data));
         database.insertIndicatorPacket(indicatorPacket(data));
-        database.insertProfitPacket(profitPacket(data));
+        database.insertProfitPacket(profitPacket(data, array));
     }
     console.log('DONE')
-}
+} 
 
-generateData()
+// generateData();
+
 
 module.exports.makeRandom = makeRandom;
 module.exports.userPacket = userPacket;
