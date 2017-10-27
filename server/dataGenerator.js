@@ -1,4 +1,3 @@
-const mocker = require('mocker-data-generator').default;
 const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
@@ -74,16 +73,22 @@ let profitPacket = (data) => {
 }
 
 // Run the database function to insert new data
-// var generateData = () => {
-//     for (var i = 0; i <= 10000; i ++) {
-//         var data = makeRandom();
-//         database.insertUserPacket(userPacket(data));
-//         database.insertIndicatorPacket(indicatorPacket(data));
-//         database.insertProfitPacket(profitPacket(data));
-//     }
-// }
+var generateData = () => {
+    for (var i = 0; i <= 10; i ++) {
+        var data = makeRandom();
+        database.insertUserPacket(userPacket(data));
+        database.insertIndicatorPacket(indicatorPacket(data));
+        database.insertProfitPacket(profitPacket(data));
+    }
+    console.log('DONE')
+}
 
-// generateData()
+generateData()
 
+module.exports.makeRandom = makeRandom;
+module.exports.userPacket = userPacket;
+module.exports.indicatorPacket = indicatorPacket;
+module.exports.profitPacket = profitPacket;
+module.exports.generateData = generateData;
 
 
