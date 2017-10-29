@@ -71,9 +71,9 @@ let profitPacket = (data, array) => {
 }
 
 var generateData = () => {
-    array = PD.rchisq(100000, 100);
+    array = PD.rchisq(500000, 100);
 
-    for (var i = 0; i <= 90000; i ++) {
+    for (var i = 0; i <= 500000; i ++) {
         var data = makeRandom(array);
         database.insertUserPacket(userPacket(data));
         database.insertIndicatorPacket(indicatorPacket(data));
@@ -82,7 +82,7 @@ var generateData = () => {
     console.log('DONE')
 } 
 
-// generateData();
+generateData();
 
 
 module.exports.makeRandom = makeRandom;
