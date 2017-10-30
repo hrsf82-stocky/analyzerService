@@ -38,10 +38,11 @@ myNamespace.round = function(number, precision) {
 // **************** GENERATE DATA PACKETS ***************
 // ====================================================== 
 
+var rounds = 1000000
 
 let userPackets = (data) => {
     const userData = [];
-    for (var i = 0; i < 100000; i ++) {
+    for (var i = 0; i < rounds; i ++) {
         let packet = {}
         packet.user_id = data.user_i;
         packet.totalSessions =data.sessions;
@@ -52,7 +53,7 @@ let userPackets = (data) => {
 
 let indicatorPackets = (data) => {
     const indicatorData = [];
-        for (var i = 0; i < 100000; i ++) {        
+        for (var i = 0; i < rounds; i ++) {        
             let packet = {}
             packet.user_id = data.user_id,
             packet.indicator = indicator[Math.floor(
@@ -66,7 +67,7 @@ let indicatorPackets = (data) => {
 
 let profitPackets = (data, array) => {
     const profitData = [];
-    for (var i = 0; i < 100000; i ++) {        
+    for (var i = 0; i < rounds; i ++) {        
         let packet = {}
         packet.user_id = data.user_id;
         packet.currencyPair = majorPair[Math.floor(
@@ -78,13 +79,13 @@ let profitPackets = (data, array) => {
 }
 
 var generateData = () => {
-    array = PD.rchisq(100000, 100);
+    array = PD.rchisq(rounds, 100);
 
     var data = makeRandom(array);
     database.insertUserPackets(userPackets(data));
     database.insertIndicatorPackets(indicatorPackets(data));
     database.insertProfitPackets(profitPackets(data, array));
-    
+
     console.log('DONE')
 } 
 
