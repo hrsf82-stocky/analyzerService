@@ -38,57 +38,64 @@ myNamespace.round = function(number, precision) {
 // **************** GENERATE DATA PACKETS ***************
 // ====================================================== 
 
-let userPacket = (data) => {
-    let packet = {}
-    packet.user = {
-        user_id: data.user_id,
-        totalSessions: data.sessions,
+var rounds = 1000000
+
+let userPackets = (data) => {
+    const userData = [];
+    for (var i = 0; i < rounds; i ++) {
+        let packet = {}
+        packet.user_id = data.user_i;
+        packet.totalSessions =data.sessions;
+        userData.push(packet);
     }
-    return packet;
+    return userData;
 }
 
-let indicatorPacket = (data) => {
-    let packet = {}
-    packet.indicators = {
-        user_id: data.user_id,
-        indicator: indicator[Math.floor(
-            Math.random() * indicator.length)],
-        totalViews: data.views,
-        average: myNamespace.round(data.average, 2),
-    }
-    return packet;
+let indicatorPackets = (data) => {
+    const indicatorData = [];
+        for (var i = 0; i < rounds; i ++) {        
+            let packet = {}
+            packet.user_id = data.user_id,
+            packet.indicator = indicator[Math.floor(
+                    Math.random() * indicator.length)];
+            packet.totalViews = data.views;
+            packet.average = myNamespace.round(data.average, 2);
+            indicatorData.push(packet);
+        }
+    return indicatorData;
 }
 
-let profitPacket = (data, array) => {
-    let packet = {}
-    packet.profits = {
-        user_id: data.user_id,
-        currencyPair: majorPair[Math.floor(
-            Math.random() * majorPair.length)],
-        profitNumber: array.pop(),
+let profitPackets = (data, array) => {
+    const profitData = [];
+    for (var i = 0; i < rounds; i ++) {        
+        let packet = {}
+        packet.user_id = data.user_id;
+        packet.currencyPair = majorPair[Math.floor(
+                Math.random() * majorPair.length)],
+        packet.profitNumber = array.pop();
+        profitData.push(packet);
     }
-    return packet;  
+    return profitData;  
 }
 
 var generateData = () => {
-    array = PD.rchisq(100000, 100);
+    array = PD.rchisq(rounds, 100);
 
-    for (var i = 0; i <= 90000; i ++) {
-        var data = makeRandom(array);
-        database.insertUserPacket(userPacket(data));
-        database.insertIndicatorPacket(indicatorPacket(data));
-        database.insertProfitPacket(profitPacket(data, array));
-    }
+    var data = makeRandom(array);
+    database.insertUserPackets(userPackets(data));
+    database.insertIndicatorPackets(indicatorPackets(data));
+    database.insertProfitPackets(profitPackets(data, array));
+
     console.log('DONE')
 } 
 
-// generateData();
+generateData();
 
 
 module.exports.makeRandom = makeRandom;
-module.exports.userPacket = userPacket;
-module.exports.indicatorPacket = indicatorPacket;
-module.exports.profitPacket = profitPacket;
+module.exports.userPackets = userPackets;
+module.exports.indicatorPackets = indicatorPackets;
+module.exports.profitPackets = profitPackets;
 module.exports.generateData = generateData;
 
 
