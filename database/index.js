@@ -29,9 +29,10 @@ let insertUserPacket = (packet) => {
     pool.query(queryString, values, (err, results) => {
         if (err) {
         console.error('ERROR', err);
-        } else {
-        console.log('Success!!!')
-        }
+        } 
+        // else {
+        // console.log('Success!!!')
+        // }
     });
 }
 
@@ -41,9 +42,10 @@ let insertIndicatorPacket = (packet) => {
     pool.query(queryString, values, (err, results) => {
         if (err) {
         console.error('ERROR', err);
-        } else {
-        console.log('Success!!!')
-        }
+        } 
+        // else {
+        // console.log('Success!!!')
+        // }
     });
 }
 
@@ -53,9 +55,10 @@ let insertProfitPacket = (packet) => {
     pool.query(queryString, values, (err, results) => {
         if (err) {
         console.error('ERROR', err);
-        } else {
-        console.log('Success!!!')
-        }
+        } 
+        // else {
+        // console.log('Success!!!')
+        // }
     });   
 }
 
