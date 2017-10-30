@@ -1,67 +1,70 @@
-const pg = require('pg');
+var Promise = require('bluebird');
 
-// =======================================================
-// ***************** CONNECT TO POSTGRESQL ***************
-// =======================================================
+// ====================================================== 
+// ************** SEQUELIZE SETUP AND INIT **************
+// ====================================================== 
 
-let config = {};
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('stocky', 'stephaniewong', '', {
+  host: '127.0.0.1',
+  dialect: 'postgres',
+});
 
-if (process.env.DATABASE_URL) {
-  config.connectionString = process.env.DATABASE_URL;
-} else {
-  config.user = 'stephaniewong';
-  config.password = '';
-  config.database = 'stocky';
+sequelize
+.authenticate()
+.then(() => {
+  console.log('Connection has been established successfully.');
+})
+.catch(err => {
+  console.error('Unable to connect to the database:', err);
+});
+
+
+// ====================================================== 
+// ***************** MODEL DEFINITIONS ******************
+// ====================================================== 
+  
+const MyUsers = sequelize.define('MyUsers', {
+    user_id: Sequelize.INTEGER,
+    totalSessions: Sequelize.INTEGER
+});
+
+MyUsers.sync();
+
+const Indicators = sequelize.define('Indicators', {    
+    user_id: Sequelize.INTEGER,
+    indicator: Sequelize.STRING,
+    totalViews: Sequelize.INTEGER,
+    average: Sequelize.FLOAT, 
+});
+
+Indicators.sync();
+
+const Profits = sequelize.define('Profits', {    
+      user_id: Sequelize.INTEGER,
+      currencyPair: Sequelize.STRING,
+      profitNumber: Sequelize.FLOAT,
+});
+
+Profits.sync();
+
+// ====================================================== 
+// **************** BULK INSERT METHODS *****************
+// ====================================================== 
+
+const insertUserPackets = (records)=> {
+    MyUsers.bulkCreate(records);
 }
 
-let pool = new pg.Pool(config)
-pool.connect();
-
-
-// =======================================================
-// ************** INSERT DATA PACKET QUERIES *************
-// =======================================================
-
-
-let insertUserPacket = (packet) => {
-    let queryString = 'INSERT INTO MyUsers (user_id, totalSessions) VALUES ($1, $2)';
-    let values = [packet.user.user_id, packet.user.totalSessions];
-    pool.query(queryString, values, (err, results) => {
-        if (err) {
-        console.error('ERROR', err);
-        } 
-        // else {
-        // console.log('Success!!!')
-        // }
-    });
+const insertIndicatorPackets = (records)=> {
+    Indicators.bulkCreate(records);
 }
 
-let insertIndicatorPacket = (packet) => {
-    let queryString = 'INSERT INTO Indicators (user_id, indicator, totalViews, average) VALUES ($1, $2, $3, $4)';
-    let values = [packet.indicators.user_id, packet.indicators.indicator, packet.indicators.totalViews, packet.indicators.average]
-    pool.query(queryString, values, (err, results) => {
-        if (err) {
-        console.error('ERROR', err);
-        } 
-        // else {
-        // console.log('Success!!!')
-        // }
-    });
+const insertProfitPackets = (records)=> {
+    Profits.bulkCreate(records);
 }
 
-let insertProfitPacket = (packet) => {
-    let queryString = 'INSERT INTO Profits (user_id, currencyPair, profitNumber) VALUES ($1, $2, $3)';
-    let values = [packet.profits.user_id, packet.profits.currencyPair, packet.profits.profitNumber]
-    pool.query(queryString, values, (err, results) => {
-        if (err) {
-        console.error('ERROR', err);
-        } 
-        // else {
-        // console.log('Success!!!')
-        // }
-    });   
-}
 
-module.exports.insertUserPacket = insertUserPacket;
-module.exports.insertIndicatorPacket = insertIndicatorPacket;
-module.exports.insertProfitPacket = insertProfitPacket;
+module.exports.insertUserPackets = insertUserPackets;
+module.exports.insertIndicatorPackets = insertIndicatorPackets;
+module.exports.insertProfitPackets = insertProfitPackets;
