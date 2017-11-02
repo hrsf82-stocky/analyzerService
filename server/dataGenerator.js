@@ -39,7 +39,7 @@ myNamespace.round = function(number, precision) {
 // ====================================================== 
 
 // Number of rows you want to add to database
-let rounds = 100000;
+let rounds = 1;
 
 let userPackets = (data) => {
     var packet = {}
@@ -81,14 +81,26 @@ var generateData = () => {
         profit_data.push(profitPackets(data, array));
     }
     
-    database.insertUserPackets(user_data);
-    database.insertIndicatorPackets(indicator_data);
-    database.insertProfitPackets(profit_data);
+    database.insertUserPackets(user_data)
+    .then((results) => {
+        console.log(results)
+        return database.insertIndicatorPackets(indicator_data);
+    })
+    .then((results) => {
+        console.log(results)
+        return database.insertProfitPackets(profit_data);
+    })
+    .then((results) => {
+        console.log(results)
+        console.log("DONE")
+    })
+    .catch((error) => {
+        console.log(error)
+    })
 
-    console.log('DONE')
 } 
 
-// generateData();
+generateData();
 
 
 module.exports.makeRandom = makeRandom;

@@ -54,15 +54,15 @@ const profit = sequelize.define('profit', {
 // ====================================================== 
 
 const insertUserPackets = (records)=> {
-    user.bulkCreate(records);
+    return user.bulkCreate(records);
 }
 
 const insertIndicatorPackets = (records)=> {
-    indicator.bulkCreate(records);
+    return indicator.bulkCreate(records);
 }
 
 const insertProfitPackets = (records)=> {
-    profit.bulkCreate(records);
+    return profit.bulkCreate(records);
 }
 
 
