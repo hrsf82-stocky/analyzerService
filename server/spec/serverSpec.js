@@ -7,7 +7,7 @@ describe('Server', function() {
         
     describe('PostgreSQL server', function() {
         it('Should respond', function(done) {
-        request('http://127.0.0.1:8080/', function(error, response, body) {
+        request('http://127.0.0.1:5432/', function(error, response, body) {
             expect(error).to.not.exist;
             done();
         });
@@ -48,21 +48,21 @@ describe('Data Generators', function() {
     
         describe('userPacket function', function() {
             it('should generate an object', function(done) {
-                expect(dg.userPacket(data)).to.be.an('object');
+                expect(dg.userPackets(data)).to.be.an('object');
                 done();
             });
         });
     
         describe('indicatorPacket function', function() {
             it('should generate an object', function(done) {
-                expect(dg.indicatorPacket(data)).to.be.an('object');
+                expect(dg.indicatorPackets(data)).to.be.an('object');
                 done();
             });
         });
     
         describe('profitPacket function', function() {
             it('should generate an object', function(done) {
-                expect(dg.profitPacket(data, array)).to.be.an('object');
+                expect(dg.profitPackets(data, array)).to.be.an('object');
                 done();
             });
         });

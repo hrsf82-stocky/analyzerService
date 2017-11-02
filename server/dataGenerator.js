@@ -38,53 +38,52 @@ myNamespace.round = function(number, precision) {
 // **************** GENERATE DATA PACKETS ***************
 // ====================================================== 
 
-var rounds = 1000000
+// Number of rows you want to add to database
+let rounds = 100000;
 
 let userPackets = (data) => {
-    const userData = [];
-    for (var i = 0; i < rounds; i ++) {
-        let packet = {}
-        packet.user_id = data.user_i;
-        packet.totalSessions =data.sessions;
-        userData.push(packet);
-    }
-    return userData;
+    var packet = {}
+    packet.user_id = data.user_id;
+    packet.total_sessions = data.sessions;
+    return packet;
 }
 
 let indicatorPackets = (data) => {
-    const indicatorData = [];
-        for (var i = 0; i < rounds; i ++) {        
-            let packet = {}
-            packet.user_id = data.user_id,
-            packet.indicator = indicator[Math.floor(
-                    Math.random() * indicator.length)];
-            packet.totalViews = data.views;
-            packet.average = myNamespace.round(data.average, 2);
-            indicatorData.push(packet);
-        }
-    return indicatorData;
+    var packet = {}
+    packet.user_id = data.user_id,
+    packet.indicator = indicator[Math.floor(
+            Math.random() * indicator.length)];
+    packet.total_views = data.views;
+    packet.average = myNamespace.round(data.average, 2);
+    return packet;
 }
 
 let profitPackets = (data, array) => {
-    const profitData = [];
-    for (var i = 0; i < rounds; i ++) {        
-        let packet = {}
-        packet.user_id = data.user_id;
-        packet.currencyPair = majorPair[Math.floor(
-                Math.random() * majorPair.length)],
-        packet.profitNumber = array.pop();
-        profitData.push(packet);
-    }
-    return profitData;  
+    var packet = {}
+    packet.user_id = data.user_id;
+    packet.currency_pair = majorPair[Math.floor(
+            Math.random() * majorPair.length)],
+    packet.profit_number = array.pop();
+    return packet;  
 }
 
 var generateData = () => {
-    array = PD.rchisq(rounds, 100);
+    array = PD.rchisq(rounds*2, 100);
 
-    var data = makeRandom(array);
-    database.insertUserPackets(userPackets(data));
-    database.insertIndicatorPackets(indicatorPackets(data));
-    database.insertProfitPackets(profitPackets(data, array));
+    let user_data = [];
+    let indicator_data = [];
+    let profit_data = [];
+    
+    for (let i = 0; i < rounds; i ++) {
+        let data = makeRandom(array);
+        user_data.push(userPackets(data));
+        indicator_data.push(indicatorPackets(data));
+        profit_data.push(profitPackets(data, array));
+    }
+    
+    database.insertUserPackets(user_data);
+    database.insertIndicatorPackets(indicator_data);
+    database.insertProfitPackets(profit_data);
 
     console.log('DONE')
 } 
