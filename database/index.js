@@ -24,44 +24,45 @@ sequelize
 // ***************** MODEL DEFINITIONS ******************
 // ====================================================== 
   
-const MyUsers = sequelize.define('MyUsers', {
+const user = sequelize.define('user', {
     user_id: Sequelize.INTEGER,
-    totalSessions: Sequelize.INTEGER
+    total_sessions: Sequelize.INTEGER
 });
 
-MyUsers.sync();
+// user.sync();
 
-const Indicators = sequelize.define('Indicators', {    
+const indicator = sequelize.define('indicator', {    
     user_id: Sequelize.INTEGER,
     indicator: Sequelize.STRING,
-    totalViews: Sequelize.INTEGER,
+    total_views: Sequelize.INTEGER,
     average: Sequelize.FLOAT, 
 });
 
-Indicators.sync();
+// indicator.sync();
 
-const Profits = sequelize.define('Profits', {    
+const profit = sequelize.define('profit', {    
       user_id: Sequelize.INTEGER,
-      currencyPair: Sequelize.STRING,
-      profitNumber: Sequelize.FLOAT,
+      currency_pair: Sequelize.STRING,
+      profit_number: Sequelize.FLOAT,
 });
 
-Profits.sync();
+// profit.sync();
+
 
 // ====================================================== 
 // **************** BULK INSERT METHODS *****************
 // ====================================================== 
 
 const insertUserPackets = (records)=> {
-    MyUsers.bulkCreate(records);
+    return user.bulkCreate(records);
 }
 
 const insertIndicatorPackets = (records)=> {
-    Indicators.bulkCreate(records);
+    return indicator.bulkCreate(records);
 }
 
 const insertProfitPackets = (records)=> {
-    Profits.bulkCreate(records);
+    return profit.bulkCreate(records);
 }
 
 
