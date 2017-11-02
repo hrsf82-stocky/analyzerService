@@ -88,7 +88,7 @@ var generateData = () => {
     console.log('DONE')
 } 
 
-generateData();
+// generateData();
 
 
 module.exports.makeRandom = makeRandom;

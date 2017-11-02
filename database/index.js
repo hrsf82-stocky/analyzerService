@@ -29,7 +29,7 @@ const user = sequelize.define('user', {
     total_sessions: Sequelize.INTEGER
 });
 
-user.sync();
+// user.sync();
 
 const indicator = sequelize.define('indicator', {    
     user_id: Sequelize.INTEGER,
@@ -38,7 +38,7 @@ const indicator = sequelize.define('indicator', {
     average: Sequelize.FLOAT, 
 });
 
-indicator.sync();
+// indicator.sync();
 
 const profit = sequelize.define('profit', {    
       user_id: Sequelize.INTEGER,
@@ -46,7 +46,7 @@ const profit = sequelize.define('profit', {
       profit_number: Sequelize.FLOAT,
 });
 
-profit.sync();
+// profit.sync();
 
 
 // ====================================================== 

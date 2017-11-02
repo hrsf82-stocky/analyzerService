@@ -4,6 +4,7 @@ config/production.json
 config/staging.json
 config/test.json
 database/config.js
+server/config.json
 
 # OS X
 .DS_Store

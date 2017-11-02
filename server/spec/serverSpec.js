@@ -5,9 +5,9 @@ var dg = require('../dataGenerator.js');
 
 describe('Server', function() {
         
-    describe('PostgreSQL server', function() {
+    describe('node server', function() {
         it('Should respond', function(done) {
-        request('http://127.0.0.1:5432/', function(error, response, body) {
+        request('http://127.0.0.1:8080/', function(error, response, body) {
             expect(error).to.not.exist;
             done();
         });
