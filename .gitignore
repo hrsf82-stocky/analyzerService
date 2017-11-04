@@ -5,6 +5,7 @@ config/staging.json
 config/test.json
 database/config.js
 server/config.json
+elastic
 
 # OS X
 .DS_Store
