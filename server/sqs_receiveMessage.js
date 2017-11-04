@@ -1,5 +1,8 @@
 const AWS = require('aws-sdk');
+AWS.config.loadFromPath('./config.json');
+
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+sqs.config.setPromisesDependency(require('bluebird'));
 
 var queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
 
@@ -15,23 +18,38 @@ var params = {
   VisibilityTimeout: 0,
   WaitTimeSeconds: 0
  };
- 
- sqs.receiveMessage(params, function(err, data) {
-   if (err) {
-     console.log("Receive Error", err);
-   } else {
-     var deleteParams = {
-       QueueUrl: queueURL,
-       ReceiptHandle: data.Messages[0].ReceiptHandle
-     };
-     sqs.deleteMessage(deleteParams, function(err, data) {
-       if (err) {
-         console.log("Delete Error", err);
-       } else {
-         console.log("Message Deleted", data);
-       }
-     });
-   }
- });
 
- module.exports.receiveMessage = sqs.receiveMessage;
+ const getMessages = () => {
+   sqs.receiveMessage(params).promise()
+    .then((results) => {
+      if (results.Messages === undefined) {
+        throw "NO NEW SQS MESSAGES!!"
+      } else {
+        return results
+      }
+    })
+    .then((results) => {
+      // DO SOMETHING WITH THE DATA
+      // RETURN RESULTS
+  
+      var deleteParams = {
+        QueueUrl: queueURL,
+        ReceiptHandle: results.Messages[0].ReceiptHandle
+       };
+       console.log(results.Messages[0].MessageAttributes)
+       
+       sqs.deleteMessage(deleteParams).promise()
+        .then(() => {
+          console.log("DELETED!!!")
+          getMessages()
+        })
+    })
+    .catch(error => {
+      console.log(error);
+      setTimeout(getMessages, 5000)
+    })
+ }
+
+getMessages();
+
+module.exports.receiveMessage = sqs.receiveMessage;

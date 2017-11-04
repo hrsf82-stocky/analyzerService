@@ -32,7 +32,4 @@ var params = {
   .then((results) => console.log("DONE!"))
   .catch((error) => console.log(error))
 
-
-sqs.sendMessage()
-
  module.exports.sendMessage = sqs.sendMessage;
