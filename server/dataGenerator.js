@@ -39,7 +39,7 @@ myNamespace.round = function(number, precision) {
 // ====================================================== 
 
 // Number of rows you want to add to database
-let rounds = 1;
+let rounds = 300000;
 
 let userPackets = (data) => {
     var packet = {}
