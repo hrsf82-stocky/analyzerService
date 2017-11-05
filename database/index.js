@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 // ====================================================== 
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('stocky2', 'stephaniewong', '', {
+const sequelize = new Sequelize('stocky3', 'stephaniewong', '', {
   host: '127.0.0.1',
   dialect: 'postgres',
 });
@@ -31,7 +31,17 @@ const User = sequelize.define('user', {
 
 const Indicator = sequelize.define('indicator', {
     indicator: Sequelize.STRING,
-})
+    interval: Sequelize.STRING,
+}, {
+        indexes: [ // A BTREE index with an ordered field
+            {
+                unique: true,
+                method: 'BTREE',
+                fields: ['indicator', 'interval', 'pairId']
+            }
+        ]
+    }
+);
 
 const User_metric = sequelize.define('user_metric', {    
     total_views: Sequelize.INTEGER,
@@ -67,25 +77,67 @@ User.hasMany(Profit);
 Profit.belongsTo(Pair);
 Pair.hasMany(Profit);
 
+Indicator.belongsTo(Pair);
+Pair.hasMany(Indicator);
+
 sequelize.sync()
     .then((result) => console.log('done'));
     
 
 // ====================================================== 
+// ******************* QUERY METHODS ********************
+// ====================================================== 
+
+// CLIENT DATA SAMPLE
+var body = {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
+    { majorPair: 'USDGBP', interval: '5s', indicator: 'MACD' } , 
+    { majorPair: 'USDGBP', interval: '1h', indicator: 'EMA' }  ]};
+    
+var attributes = {
+    session_id: 123456789,
+    user_id: 12345678
+}
+
+// ORDER BOOK DATA SAMPLE
+var order = { userId: '12345678', profit: '100', pair: 'USDGBP' }
+
+// If receiving message from CLIENT QUEUE
+// Identify the user_id from body
+// Check if it exists in user table (findOrCreate)
+// save the user totalsessions by updating holding variable
+// update totalsessions count
+// Iterate through the payload array (promise all or promise map)
+    // Get the pair name from body, use to lookup id in pair table (findOne)
+    // get row id from (pairId, interval from body, indicator from body) (findOne)
+    // findOrCreate row in user_metrics table using indicator id and user id 
+    // this returns the entire row
+    // calculate average from totalviews and totalsessions
+    // update the new average and total views at the same time using row id 
+
+// If receiving message from ORDERBOOK QUEUE 
+// Identify the user_id from body
+// Get the row id of that user from user table
+// Identify the currency pair 
+// Get the row id of that pair from pair table
+// Use row id and pair id to look up profit number in profit table (findOrCreate)
+// set default null value to new profit number 
+// If exists, update that value
+
+// ====================================================== 
 // **************** BULK INSERT METHODS *****************
 // ====================================================== 
 
-// const insertUserPackets = (records)=> {
-//     return user.bulkCreate(records);
-// }
+const insertUserPackets = (records)=> {
+    return user.bulkCreate(records);
+}
 
-// const insertIndicatorPackets = (records)=> {
-//     return indicator.bulkCreate(records);
-// }
+const insertIndicatorPackets = (records)=> {
+    return indicator.bulkCreate(records);
+}
 
-// const insertProfitPackets = (records)=> {
-//     return profit.bulkCreate(records);
-// }
+const insertProfitPackets = (records)=> {
+    return profit.bulkCreate(records);
+}
 
 
 // module.exports.insertUserPackets = insertUserPackets;

@@ -100,8 +100,7 @@ var generateData = () => {
 
 } 
 
-generateData();
-
+// generateData();
 
 module.exports.makeRandom = makeRandom;
 module.exports.userPackets = userPackets;

@@ -15,8 +15,8 @@ var params = {
      "All"
   ],
   QueueUrl: queueURL,
-  VisibilityTimeout: 0,
-  WaitTimeSeconds: 0
+  VisibilityTimeout: 60,
+  WaitTimeSeconds: 10
  };
 
  const getMessages = () => {

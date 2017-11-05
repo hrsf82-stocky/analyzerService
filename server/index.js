@@ -5,7 +5,6 @@ const app = express();
 const sendMessage = require('./sqs_sendMessage.js')
 const receiveMessage = require('./sqs_receiveMessage.js')
 
-
 // ====================================================== 
 // ********************* AWS SETUP **********************
 // ====================================================== 
@@ -18,17 +17,27 @@ AWS.config.loadFromPath('./config.json');
 
 // Create an SQS service object
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+sqs.config.setPromisesDependency(require('bluebird'));
 
-var queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+const queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+let params = {};
 
-var params = {};
+// ====================================================== 
+// ******************* SEVER METHODS ********************
+// ====================================================== 
 
-sqs.listQueues(params, function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else {
-    console.log("Success", data.QueueUrls);
-  }
+sqs.listQueues(params).promise()
+.then((results) => console.log("DONE!", results.QueueUrls))
+.catch((error) => console.log("ERROR", error))
+
+sendMessage
+
+// Insert into the Postgres database
+app.post('/insert',function(req,res){
+  var user_name=req.body.user;
+  var password=req.body.password;
+  console.log("User name = "+user_name+", password is "+password);
+  res.end("INSERT COMPLETE");
 });
 
 // ====================================================== 

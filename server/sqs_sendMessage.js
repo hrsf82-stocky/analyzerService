@@ -9,7 +9,7 @@ sqs.config.setPromisesDependency(require('bluebird'));
 var queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
 
 var params = {
-  DelaySeconds: 10,
+  DelaySeconds: 0,
   MessageAttributes: {
    "Title": {
      DataType: "String",
@@ -28,8 +28,8 @@ var params = {
   QueueUrl: queueURL
  };
  
- sqs.sendMessage(params).promise()
-  .then((results) => console.log("DONE!"))
-  .catch((error) => console.log(error))
+sqs.sendMessage(params).promise()
+.then((results) => console.log("DONE!"))
+.catch((error) => console.log(error))
 
- module.exports.sendMessage = sqs.sendMessage;
+module.exports.sendMessage = sqs.sendMessage;
