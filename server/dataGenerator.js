@@ -1,25 +1,42 @@
+// ====================================================== 
+// *************** RANDOM VALUE GENERATORS **************
+// ====================================================== 
+
 const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
 var Promise = require('bluebird');
 
 
-// ====================================================== 
-// *************** GENERATE RANDOM VALUES ***************
-// ====================================================== 
+// CLIENT DATA SAMPLE
+// var data = {
+//     body : {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
+//         { majorPair: 'GBPUSD', interval: '5s', indicator: 'MACD' } , 
+//         { majorPair: 'GBPUSD', interval: '1h', indicator: 'EMA' }  ]},
 
-const indicator = [ 'MACD', 'EMA', 'MA' ];
+//     attributes : {
+//         session_id: 123456789,s
+//         user_id: 999999
+//     }
+// }
 
-const majorPair = [
-    'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY',
-    'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY', ];
+const rounds = 300000;
+const array = PD.rchisq(rounds*2, 100);
+const pairIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const majorPair = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
+const indicators = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
+const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
+const userNumbers = () => { var results = []; for (var i = 0; i < 10000; i ++) { 
+    results.push(faker.random.number({min:10000000, max:99999999})) } return results; }
+const userIds = () => { var results = []; for (var i = 0; i < 10000; i ++) { results.push(i) } return results; }
 
 let makeRandom = (data) => {
     let packet = {};
-    packet.user_id =  faker.random.number({min:10000000, max:99999999});
-    packet.views = faker.random.number(500);
-    packet.sessions = faker.random.number({min:50, max:1000});
-    packet.average = packet.views/packet.sessions;
+    packet.user_number =  userNumbers().pop();
+    packet.userId =  userIds().pop();
+    packet.sessions = faker.random.number({min:400, max:1000});
+    packet.total_views = faker.random.number(300);
+    packet.average = packet.totalviews/packet.sessions;
     packet.array = data;
     return packet;
 }
@@ -35,25 +52,22 @@ myNamespace.round = function(number, precision) {
 };
 
 // ====================================================== 
-// **************** GENERATE DATA PACKETS ***************
+// ****************** CREATE DATA OBJECTS ***************
 // ====================================================== 
-
-// Number of rows you want to add to database
-let rounds = 300000;
 
 let userPackets = (data) => {
     var packet = {}
-    packet.user_id = data.user_id;
+    packet.user_number = data.user_number;
     packet.total_sessions = data.sessions;
     return packet;
 }
 
-let indicatorPackets = (data) => {
+let userMetricPackets = (data) => {
     var packet = {}
-    packet.user_id = data.user_id,
-    packet.indicator = indicator[Math.floor(
+    packet.userId = data.userId,
+    packet.indicatorId = indicator[Math.floor(
             Math.random() * indicator.length)];
-    packet.total_views = data.views;
+    packet.total_views = data.total_views;
     packet.average = myNamespace.round(data.average, 2);
     return packet;
 }
@@ -68,7 +82,6 @@ let profitPackets = (data, array) => {
 }
 
 var generateData = () => {
-    array = PD.rchisq(rounds*2, 100);
 
     let user_data = [];
     let indicator_data = [];
@@ -102,10 +115,45 @@ var generateData = () => {
 
 // generateData();
 
+// ====================================================== 
+// **************** BULK INSERT METHODS *****************
+// ====================================================== 
+
+const insertUserPackets = (records)=> {
+    return User.bulkCreate(
+        records, 
+        {
+            updateOnDuplicate: ['user_number','total_sessions']
+        }
+    );
+}
+
+const insertUserMetricPackets = (records)=> {
+    return User_metric.bulkCreate(
+        records, 
+        {
+            updateOnDuplicate: ['total_views','average', 'userId', 'indicatorId']
+        }
+    );
+}
+
+const insertProfitPackets = (records)=> {
+    return Profit.bulkCreate(
+        records, 
+        {
+            updateOnDuplicate: ['profit_number','userId', 'pairId']
+        }
+    );
+}
+
+
 module.exports.makeRandom = makeRandom;
 module.exports.userPackets = userPackets;
 module.exports.indicatorPackets = indicatorPackets;
 module.exports.profitPackets = profitPackets;
 module.exports.generateData = generateData;
+module.exports.insertUserPackets = insertUserPackets;
+module.exports.insertUserMetricPackets = insertUserMetricPackets;
+module.exports.insertProfitPackets = insertProfitPackets;
 
 

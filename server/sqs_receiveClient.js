@@ -19,17 +19,6 @@ const params = {
   WaitTimeSeconds: 10
  };
 
-/*  CLIENT DATA SAMPLE >>>>>>>>>>>>>>>>>>>>>>>>
-
-var body = {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
-{ majorPair: 'USDGBP', interval: '5s', indicator: 'MACD' } , 
-{ majorPair: 'USDGBP', interval: '1h', indicator: 'EMA' }  ]};
-
-var attributes = {
-  session_id: 123456789,
-  user_id: 12345678
-} */
-
 const getMessages = () => {
   sqs.receiveMessage(params).promise()
   .then((results) => {

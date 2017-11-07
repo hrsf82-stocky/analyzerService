@@ -84,6 +84,10 @@ Pair.hasMany(Profit);
 Indicator.belongsTo(Pair);
 Pair.hasMany(Indicator);
 
+// >>>>>>>>>>> UNCOMMENT TO SYNC ALL METHODS >>>>>>>>>>>>
+// sequelize.sync()
+// .then((result) => console.log('done'));
+
 // ====================================================== 
 // **************** BULK CREATE METHODS *****************
 // ====================================================== 
@@ -103,7 +107,7 @@ Pair.hasMany(Indicator);
 //     return Pair.findAll();
 //   }).then(pairs => {
 //     console.log(pairs) // ... in order to get the array of user objects
-//   })
+//   }).catch((error) => {console.log(error)})
 
 // const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
 // const pairs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -127,32 +131,19 @@ Pair.hasMany(Indicator);
 //     return results;
 // }
 
-// Indicator.bulkCreate(bulkIndicators()).then(() => { 
+// const array = bulkIndicators();
+
+// Indicator.bulkCreate( array )
+// .then(() => { // Notice: There are no arguments here, as of right now you'll have to...
 //     return Pair.findAll();
 //   }).then(pairs => {
-//     console.log(pairs) 
-//   })
-
-// >>>>>>>>>>> UNCOMMENT TO SYNC ALL METHODS >>>>>>>>>>>>
-// sequelize.sync()
-//     .then((result) => console.log('done'));
+//     console.log(pairs) // ... in order to get the array of user objects
+//   }).catch((error) => {console.log(error)})
 
 
 // ====================================================== 
 // ******************* QUERY METHODS ********************
 // ====================================================== 
-
-// CLIENT DATA SAMPLE
-// var data = {
-//     body : {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
-//         { majorPair: 'GBPUSD', interval: '5s', indicator: 'MACD' } , 
-//         { majorPair: 'GBPUSD', interval: '1h', indicator: 'EMA' }  ]},
-
-//     attributes : {
-//         session_id: 123456789,
-//         user_id: 999999
-//     }
-// }
 
 // If receiving message from CLIENT QUEUE
 const insertClientData = (data) => {
@@ -259,27 +250,7 @@ const insertOrderData = (order) => {
     })  
 }
 
-insertOrderData(order);
+// insertOrderData(order);
 
-// ====================================================== 
-// **************** BULK INSERT METHODS *****************
-// ====================================================== 
-
-const insertUserPackets = (records)=> {
-    return user.bulkCreate(records);
-}
-
-const insertIndicatorPackets = (records)=> {
-    return indicator.bulkCreate(records);
-}
-
-const insertProfitPackets = (records)=> {
-    return profit.bulkCreate(records);
-}
-
-
-module.exports.insertUserPackets = insertUserPackets;
-module.exports.insertIndicatorPackets = insertIndicatorPackets;
-module.exports.insertProfitPackets = insertProfitPackets;
 module.exports.insertClientData = insertClientData;
 module.exports.insertOrderData = insertOrderData;

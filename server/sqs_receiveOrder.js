@@ -19,9 +19,6 @@ var params = {
   WaitTimeSeconds: 10
  };
 
-// ORDER BOOK SAMPLE DATA >>>>>>>>>>>>>>>>>>>>>>>>
-// var order = { userId: '12345678', profit: '100', pair: 'USDGBP' }
-
 const getMessages = () => {
   sqs.receiveMessage(params).promise()
   .then((results) => {
