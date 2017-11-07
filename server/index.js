@@ -1,9 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('../database/index.js');
+const database = require('../database/index.js');
 const app = express();
 const sendMessage = require('./sqs_sendMessage.js')
-const receiveMessage = require('./sqs_receiveMessage.js')
+const receiveClient = require('./sqs_receiveClient.js')
+const receiveOrder = require('./sqs_receiveOrder.js')
 
 // ====================================================== 
 // ********************* AWS SETUP **********************
@@ -27,18 +28,12 @@ let params = {};
 // ====================================================== 
 
 sqs.listQueues(params).promise()
-.then((results) => console.log("DONE!", results.QueueUrls))
-.catch((error) => console.log("ERROR", error))
+  .then((results) => console.log("DONE!", results.QueueUrls))
+  .catch((error) => console.log("ERROR", error))
 
-sendMessage
+receiveClient.getMessages()
 
-// Insert into the Postgres database
-app.post('/insert',function(req,res){
-  var user_name=req.body.user;
-  var password=req.body.password;
-  console.log("User name = "+user_name+", password is "+password);
-  res.end("INSERT COMPLETE");
-});
+receiveOrder.getMessages()
 
 // ====================================================== 
 // ****************** LOCAL HOST SETUP ******************
