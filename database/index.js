@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-AWS.config.loadFromPath('../server/config.json');
+AWS.config.loadFromPath('./config.json');
 sqs.config.setPromisesDependency(require('bluebird'));
 
 // ====================================================== 
@@ -140,6 +140,18 @@ Pair.hasMany(Indicator);
 //     console.log(pairs) // ... in order to get the array of user objects
 //   }).catch((error) => {console.log(error)})
 
+const insertUserPackets = (records)=> {
+    return User.bulkCreate( records );
+}
+
+const insertUserMetricPackets = (records)=> {
+    return User_metric.bulkCreate( records );
+}
+
+const insertProfitPackets = (records)=> {
+    return Profit.bulkCreate( records );
+}
+
 
 // ====================================================== 
 // ******************* QUERY METHODS ********************
@@ -254,3 +266,6 @@ const insertOrderData = (order) => {
 
 module.exports.insertClientData = insertClientData;
 module.exports.insertOrderData = insertOrderData;
+module.exports.insertUserPackets = insertUserPackets;
+module.exports.insertUserMetricPackets = insertUserMetricPackets;
+module.exports.insertProfitPackets = insertProfitPackets;

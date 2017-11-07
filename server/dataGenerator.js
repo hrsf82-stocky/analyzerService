@@ -5,155 +5,120 @@
 const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
+const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
+const indicatorTypes = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
+const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 
+                        'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
 
-// CLIENT DATA SAMPLE
-// var data = {
-//     body : {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
-//         { majorPair: 'GBPUSD', interval: '5s', indicator: 'MACD' } , 
-//         { majorPair: 'GBPUSD', interval: '1h', indicator: 'EMA' }  ]},
-
-//     attributes : {
-//         session_id: 123456789,s
-//         user_id: 999999
-//     }
+// SAMPLE FROM CLIENT
+// var body = {payload: [ { majorPair: ‘EURUSD’, interval: ‘5s’, indicator: ‘MACD’ } , 
+//   { majorPair: ‘USDGBP’, interval: ‘5s’, indicator: ‘MACD’ } , 
+//   { majorPair: ‘USDGBP’, interval: ‘1h’, indicator: ‘EMA’ }  ]};
+// var attributes = {
+//     session_id: 123456789,
+//     user_id: 12345678
 // }
 
-const rounds = 300000;
-const array = PD.rchisq(rounds*2, 100);
-const pairIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const majorPair = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
-const indicators = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
-const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
-const userNumbers = () => { var results = []; for (var i = 0; i < 10000; i ++) { 
-    results.push(faker.random.number({min:10000000, max:99999999})) } return results; }
-const userIds = () => { var results = []; for (var i = 0; i < 10000; i ++) { results.push(i) } return results; }
-
-let makeRandom = (data) => {
-    let packet = {};
-    packet.user_number =  userNumbers().pop();
-    packet.userId =  userIds().pop();
-    packet.sessions = faker.random.number({min:400, max:1000});
-    packet.total_views = faker.random.number(300);
-    packet.average = packet.totalviews/packet.sessions;
-    packet.array = data;
-    return packet;
-}
-
-let myNamespace = {};
-
-// Helper function round numbers to desired decimal points
-myNamespace.round = function(number, precision) {
-    let factor = Math.pow(10, precision);
-    let tempNumber = number * factor;
-    let roundedTempNumber = Math.round(tempNumber);
-    return roundedTempNumber / factor;
-};
+// SAMPLE FROM ORDER BOOK
+// { userId: INT, profit: FLOAT, pair: STRING }
 
 // ====================================================== 
-// ****************** CREATE DATA OBJECTS ***************
+// **************** GENERATE CLIENT DATA ****************
 // ====================================================== 
 
-let userPackets = (data) => {
-    var packet = {}
-    packet.user_number = data.user_number;
-    packet.total_sessions = data.sessions;
-    return packet;
+// Function to make { majorPair: ‘EURUSD’, interval: ‘5s’, indicator: ‘MACD’ } with random values
+var makeClientObject = () => {
+  var object = {};
+  object.majorPair = majorPairTypes[Math.floor(Math.random() * majorPairTypes.length)];
+  object.interval = intervalTypes[Math.floor(Math.random() * intervalTypes.length)];
+  object.indicator = indicatorTypes[Math.floor(Math.random() * indicatorTypes.length)];
+  return object;
 }
 
-let userMetricPackets = (data) => {
-    var packet = {}
-    packet.userId = data.userId,
-    packet.indicatorId = indicator[Math.floor(
-            Math.random() * indicator.length)];
-    packet.total_views = data.total_views;
-    packet.average = myNamespace.round(data.average, 2);
-    return packet;
+// Function to make n number of those objects into an array
+var makePayload = () => {
+  var results = [];
+  for (var i = 0; i <= faker.random.number({min:2, max:15}); i ++) {
+    results.push(makeClientObject());
+  }
+  return results;
 }
 
-let profitPackets = (data, array) => {
-    var packet = {}
-    packet.user_id = data.user_id;
-    packet.currency_pair = majorPair[Math.floor(
-            Math.random() * majorPair.length)],
-    packet.profit_number = array.pop();
-    return packet;  
+// Function to wrap those in the body property 
+var makeClientPacket = () => {
+  var object = {
+    body : { payload : makePayload() },
+    attributes : {
+        session_id: 123456789,
+        user_id: faker.random.number({min:10000000, max:99999999})
+      }
+  };
+  return object;
 }
 
-var generateData = () => {
+// Function to make an array of client objects
+var clientArrayMaker = () => {
+  var results = [];
+  for (var i = 0; i < 1000; i ++) {
+    results.push(makeClientPacket())
+  }
+  return results;
+}
 
-    let user_data = [];
-    let indicator_data = [];
-    let profit_data = [];
-    
-    for (let i = 0; i < rounds; i ++) {
-        let data = makeRandom(array);
-        user_data.push(userPackets(data));
-        indicator_data.push(indicatorPackets(data));
-        profit_data.push(profitPackets(data, array));
-    }
-    
-    database.insertUserPackets(user_data)
-    .then((results) => {
-        console.log(results)
-        return database.insertIndicatorPackets(indicator_data);
-    })
-    .then((results) => {
-        console.log(results)
-        return database.insertProfitPackets(profit_data);
-    })
-    .then((results) => {
-        console.log(results)
-        console.log("DONE")
-    })
-    .catch((error) => {
-        console.log(error)
-    })
-
-} 
-
-// generateData();
+console.log(clientArrayMaker());
 
 // ====================================================== 
-// **************** BULK INSERT METHODS *****************
+// **************** GENERATE ORDER DATA *****************
 // ====================================================== 
 
-const insertUserPackets = (records)=> {
-    return User.bulkCreate(
-        records, 
-        {
-            updateOnDuplicate: ['user_number','total_sessions']
-        }
-    );
+// Function to make { userId: INT, profit: FLOAT, pair: STRING } with random values
+var makeOrderObject = () => {
+  var object = {};
+  object.userId = faker.random.number({min:10000000, max:99999999});
+  object.profit = faker.random.number({min:-200, max:500});
+  object.pair = majorPairTypes[Math.floor(Math.random() * majorPairTypes.length)];
+  return object;
 }
 
-const insertUserMetricPackets = (records)=> {
-    return User_metric.bulkCreate(
-        records, 
-        {
-            updateOnDuplicate: ['total_views','average', 'userId', 'indicatorId']
-        }
-    );
+// Function to make an array of client objects
+var orderArrayMaker = () => {
+  
 }
 
-const insertProfitPackets = (records)=> {
-    return Profit.bulkCreate(
-        records, 
-        {
-            updateOnDuplicate: ['profit_number','userId', 'pairId']
-        }
-    );
+// ====================================================== 
+// **************** INSERT INTO DATABASE ****************
+// ====================================================== 
+
+// PROMISE REDUCE EXAMPLE:
+https://stackoverflow.com/questions/24660096/correct-way-to-write-loops-for-promise
+
+// let asyncFn = (item) => {
+//   return new Promise((resolve, reject) => {
+//     setTimeout( () => {console.log(item); resolve(true)}, 1000 )
+//   })
+// }
+
+// asyncFn('a')
+// .then(()=>{return async('b')})
+// .then(()=>{return async('c')})
+// .then(()=>{return async('d')})
+
+// let a = ['a','b','c','d']
+
+// a.reduce((previous, current, index, array) => {
+//   return previous                                    // initiates the promise chain
+//   .then(()=>{return asyncFn(array[index])})      //adds .then() promise for each item
+// }, Promise.resolve())
+
+
+// INSERT CLIENT DATA FUNCTION WITH PROMISE REDUCE
+var bulkClientInsert = () => {
+
 }
 
+// INSERT ORDER DATA FUNCTION WITH PROMISE REDUCE
+var bulkOrderInsert = () => {
 
-module.exports.makeRandom = makeRandom;
-module.exports.userPackets = userPackets;
-module.exports.indicatorPackets = indicatorPackets;
-module.exports.profitPackets = profitPackets;
-module.exports.generateData = generateData;
-module.exports.insertUserPackets = insertUserPackets;
-module.exports.insertUserMetricPackets = insertUserMetricPackets;
-module.exports.insertProfitPackets = insertProfitPackets;
-
-
+}

@@ -4,6 +4,7 @@ config/production.json
 config/staging.json
 config/test.json
 database/config.js
+database/config.json
 server/config.json
 elastic
 
