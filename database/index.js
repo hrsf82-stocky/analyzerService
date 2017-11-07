@@ -84,6 +84,10 @@ Pair.hasMany(Profit);
 Indicator.belongsTo(Pair);
 Pair.hasMany(Indicator);
 
+// ====================================================== 
+// **************** BULK CREATE METHODS *****************
+// ====================================================== 
+
 // Pair.bulkCreate([
 //     { currency_pair: 'EURUSD' },
 //     { currency_pair: 'GBPUSD' },
@@ -101,59 +105,54 @@ Pair.hasMany(Indicator);
 //     console.log(pairs) // ... in order to get the array of user objects
 //   })
 
-const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
-const pairs = [1,2,3,4,5,6,7,8,9,10]
-const researchTypes = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
-const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
+// const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
+// const pairs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+// const researchTypes = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
+// const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
 
-var bulkIndicators = () => {
-    var results = []
-    for (var i = 0; i < researchTypes.length; i ++) {
-       for (var j = 0; j < intervalTypes.length; j++) {
-           for (var k = 0; k < pairs.length; k ++) {
-               var object = {
-                   indicator: researchTypes[i],
-                   interval: intervalTypes[j],
-                   pairId: pairs[k]
-               }
-               results.push(object)
-           }
-       } 
-    }
-    return results;
-}
+// var bulkIndicators = () => {
+//     var results = []
+//     for (var i = 0; i < researchTypes.length; i ++) {
+//        for (var j = 0; j < intervalTypes.length; j++) {
+//            for (var k = 0; k < pairs.length; k ++) {
+//                var object = {
+//                    indicator: researchTypes[i],
+//                    interval: intervalTypes[j],
+//                    pairId: pairs[k]
+//                }
+//                results.push(object)
+//            }
+//        } 
+//     }
+//     return results;
+// }
 
-// console.log(bulkIndicators())
-
-// Indicator.bulkCreate(bulkIndicators()).then(() => { // Notice: There are no arguments here, as of right now you'll have to...
+// Indicator.bulkCreate(bulkIndicators()).then(() => { 
 //     return Pair.findAll();
 //   }).then(pairs => {
-//     console.log(pairs) // ... in order to get the array of user objects
+//     console.log(pairs) 
 //   })
 
-// UNCOMMENT TO SYNC ALL METHODS
+// >>>>>>>>>>> UNCOMMENT TO SYNC ALL METHODS >>>>>>>>>>>>
 // sequelize.sync()
 //     .then((result) => console.log('done'));
+
 
 // ====================================================== 
 // ******************* QUERY METHODS ********************
 // ====================================================== 
 
 // CLIENT DATA SAMPLE
-var data = {
-    body : {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
-        { majorPair: 'GBPUSD', interval: '5s', indicator: 'MACD' } , 
-        { majorPair: 'GBPUSD', interval: '1h', indicator: 'EMA' }  ]},
+// var data = {
+//     body : {payload: [ { majorPair: 'EURUSD', interval: '5s', indicator: 'MACD' } , 
+//         { majorPair: 'GBPUSD', interval: '5s', indicator: 'MACD' } , 
+//         { majorPair: 'GBPUSD', interval: '1h', indicator: 'EMA' }  ]},
 
-    attributes : {
-        session_id: 123456789,
-        user_id: 999999
-    }
-}
-    
-
-// ORDER BOOK DATA SAMPLE
-// var order = { userId: '12345678', profit: 'FLOAT', pair: 'USDGBP' }
+//     attributes : {
+//         session_id: 123456789,
+//         user_id: 999999
+//     }
+// }
 
 // If receiving message from CLIENT QUEUE
 const insertClientData = (data) => {
@@ -168,10 +167,8 @@ const insertClientData = (data) => {
     .spread((user, created) => {
         userId = user.dataValues.id;
         total_sessions = user.dataValues.total_sessions + 1;
-        console.log("USERRRRRRRRRRR: ", user.get({
-         plain: true
-        }))
-        console.log("MADE IT!!!!!!!!: ", created);
+        console.log("MADE A NEW USER!!!: ", user.get({ plain: true }))
+        console.log("USER HAS BEEN FOUND!!!: ", created);
         return User.update(
             // update totalsessions count
             { total_sessions: user.dataValues.total_sessions + 1 },
@@ -181,21 +178,22 @@ const insertClientData = (data) => {
     .then(() => {
         // Iterate through the payload array (promise all or promise map)
         return Promise.map(actions, (action) => {
-            var pair = action.majorPair;
             // Get the pair name from body, use to lookup id in pair table (findOne)
+            var pair = action.majorPair;
+            // get indicator table row id with (['indicator', 'interval', 'pairId']) (findOne)
             return Pair.findOne({ where: {currency_pair: pair} })
-                .then((project) => {
-                    // var lookup = action.indicator + action.interval + project.dataValues.id;
-                    console.log("PROJECTTTTTTTTT:")
-                    return Indicator.findOrCreate({where: {indicator: action.indicator, interval: action.interval, pairId: project.dataValues.id}})
+                .then((indicatorRow) => {
+                    return Indicator.findOrCreate({where: {indicator: action.indicator, interval: action.interval, pairId: indicatorRow.dataValues.id}})
                 })
                 .spread((indicator, created) => {
-                    console.log("USERRRRRRRRRRR: ", indicator.get({ plain: true }))
-                    console.log("MADE IT!!!!!!!!: ", created)
+                    console.log("INDICATOR ROW HAS BEEN MADE!!!: ", indicator.get({ plain: true }))
+                    console.log("INDICATOR ROW HAS BEEN FOUND!!!: ", created)
+                    // findOrCreate row in user_metrics table using indicator id and user id 
                     return User_metric.findOrCreate({where: {userId: userId, indicatorId: indicator.dataValues.id}, defaults: {total_views: 0, average: 0}})
                 })
                 .spread((metric, created) => {
                     console.log(metric.dataValues.total_views, metric.dataValues.average, created)
+                    // update the new average and total views at the same time using row id 
                     return User_metric.update(
                         {total_views: (metric.dataValues.total_views + 1), average: (metric.dataValues.total_views + 1)/total_sessions},
                         { where: { id: metric.dataValues.id } }
@@ -209,29 +207,59 @@ const insertClientData = (data) => {
     .catch((error) => {
         console.log(error);
     })  
-
-    // get row id from (['indicator', 'interval', 'pairId']) (findOne)
-        // findOrCreate row in user_metrics table using indicator id and user id 
-        // this returns the entire row
-        // calculate average from totalviews and totalsessions
-        // update the new average and total views at the same time using row id 
 }
 
-insertClientData(data);
+// insertClientData(data);
+
+
+// ORDER BOOK DATA SAMPLE
+var order = { userId: '12345678', profit: '100', pair: 'EURUSD' }
 
 // If receiving message from ORDER QUEUE
-const insertOrderData = (data) => {
-    // If receiving message from ORDERBOOK QUEUE 
+const insertOrderData = (order) => {
     // Identify the user_id from body
+    var userNumber = order.userId;
+    var pair = order.pair;
+    var profit = order.profit;
+    var userId;
+    console.log("$$$$$$$$$$: ", profit)
     // Get the row id of that user from user table
-    // Identify the currency pair 
-    // Get the row id of that pair from pair table
-    // Use row id and pair id to look up profit number in profit table (findOrCreate)
-    // set default null value to new profit number 
-    // If exists, update that value
+    User.findOne({where: {user_number: userNumber}})
+    .then((results) => {
+        userId = results.dataValues.id;
+        console.log("RESULTSSSSSSSSS: ", results.dataValues.id);
+        console.log(pair)
+        Pair.findOne({where: {currency_pair: pair}})
+        .then((pair) => {
+            console.log(pair);
+            // Identify the currency patir 
+            pairId = pair.dataValues.id;
+            console.log("PAIR ID >>>>>>>>>>>>>>: ", pairId)            
+            // Use user id and pair id to look up profit number in profit table (findOrCreate)
+            // set default null value to new profit number 
+            return Profit.findOrCreate({ where: { userId: results.dataValues.id}, defaults: {pairId: pairId, profit_number: profit} })
+            .spread((user, created) => {
+                console.log("MADE A NEW PROFIT!!!: ", user.get({ plain: true }))
+                console.log("PROFIT HAS BEEN MADE: ", created);
 
+                // If exists, update that value
+                return Profit.update(
+                    // update totalsessions count
+                    { profit_number: profit },
+                    { where: { userId: userId, pairId: pairId} 
+                })
+            })
+        })
+    })
+    .then((results) => {
+        console.log(results);
+    })
+    .catch((error) => {
+        console.log(error);
+    })  
 }
 
+insertOrderData(order);
 
 // ====================================================== 
 // **************** BULK INSERT METHODS *****************
