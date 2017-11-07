@@ -132,13 +132,8 @@ Pair.hasMany(Indicator);
 // }
 
 // const array = bulkIndicators();
-
 // Indicator.bulkCreate( array )
-// .then(() => { // Notice: There are no arguments here, as of right now you'll have to...
-//     return Pair.findAll();
-//   }).then(pairs => {
-//     console.log(pairs) // ... in order to get the array of user objects
-//   }).catch((error) => {console.log(error)})
+
 
 const insertUserPackets = (records)=> {
     return User.bulkCreate( records );
@@ -225,22 +220,22 @@ const insertOrderData = (order) => {
     var pair = order.pair;
     var profit = order.profit;
     var userId;
-    console.log("$$$$$$$$$$: ", profit)
+    // console.log("$$$$$$$$$$: ", profit)
     // Get the row id of that user from user table
-    User.findOne({where: {user_number: userNumber}})
+    User.findOrCreate({where: {user_number: userNumber}, defaults: {total_sessions: 1}})
     .then((results) => {
-        userId = results.dataValues.id;
-        console.log("RESULTSSSSSSSSS: ", results.dataValues.id);
+        // console.log("RESULTSSSSSSSSS: ", results[0].dataValues);
+        userId = results[0].dataValues.id;
         console.log(pair)
         Pair.findOne({where: {currency_pair: pair}})
         .then((pair) => {
-            console.log(pair);
+            console.log("PAIRRRRRRRRRRRR: ",pair);
             // Identify the currency patir 
             pairId = pair.dataValues.id;
             console.log("PAIR ID >>>>>>>>>>>>>>: ", pairId)            
             // Use user id and pair id to look up profit number in profit table (findOrCreate)
             // set default null value to new profit number 
-            return Profit.findOrCreate({ where: { userId: results.dataValues.id}, defaults: {pairId: pairId, profit_number: profit} })
+            return Profit.findOrCreate({ where: { userId: results[0].dataValues.id}, defaults: {pairId: pairId, profit_number: profit} })
             .spread((user, created) => {
                 console.log("MADE A NEW PROFIT!!!: ", user.get({ plain: true }))
                 console.log("PROFIT HAS BEEN MADE: ", created);

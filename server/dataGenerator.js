@@ -61,13 +61,13 @@ var makeClientPacket = () => {
 // Function to make an array of client objects
 var clientArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 1000; i ++) {
+  for (var i = 0; i < 10; i ++) {
     results.push(makeClientPacket())
   }
   return results;
 }
 
-console.log(clientArrayMaker());
+// console.log(clientArrayMaker());
 
 // ====================================================== 
 // **************** GENERATE ORDER DATA *****************
@@ -84,8 +84,14 @@ var makeOrderObject = () => {
 
 // Function to make an array of client objects
 var orderArrayMaker = () => {
-  
+  var results = [];
+  for (var i = 0; i < 10; i ++) {
+    results.push(makeOrderObject())
+  }
+  return results;
 }
+
+// console.log(orderArrayMaker())
 
 // ====================================================== 
 // **************** INSERT INTO DATABASE ****************
@@ -115,10 +121,22 @@ https://stackoverflow.com/questions/24660096/correct-way-to-write-loops-for-prom
 
 // INSERT CLIENT DATA FUNCTION WITH PROMISE REDUCE
 var bulkClientInsert = () => {
-
+  var list = clientArrayMaker();
+  list.reduce((previous, current, index, array) => {
+    return previous                                    // initiates the promise chain
+    .then(()=>{return database.insertClientData(array[index])})      //adds .then() promise for each item
+  }, Promise.resolve())
 }
+
+// bulkClientInsert();
 
 // INSERT ORDER DATA FUNCTION WITH PROMISE REDUCE
 var bulkOrderInsert = () => {
-
+  var list = orderArrayMaker();
+  list.reduce((previous, current, index, array) => {
+    return previous                                    // initiates the promise chain
+    .then(()=>{return database.insertOrderData(array[index])})      //adds .then() promise for each item
+  }, Promise.resolve())
 }
+
+bulkOrderInsert();
