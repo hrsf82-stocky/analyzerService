@@ -1,8 +1,8 @@
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const database = require('../database/index.js');
 const app = express();
-const sendMessage = require('./sqs_sendMessage.js')
 const receiveClient = require('./sqs_receiveClient.js')
 const receiveOrder = require('./sqs_receiveOrder.js')
 

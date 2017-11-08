@@ -6,9 +6,10 @@ const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
 const Promise = require('bluebird');
-const userNumbers = () => { var results = []; for (var i = 0; i < 100000; i ++) { 
-      results.push(faker.random.number({min:10000000, max:99999999})) } return results; }
+const userNumbers = () => { var results = []; for (var i = 0; i < 10000; i ++) { 
+      results.push(faker.random.number({min:79990000, max:80000000})) } return results; }
 const userArray = userNumbers();
+// console.log(userArray)
 const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
 const indicatorTypes = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
 const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 
@@ -63,7 +64,7 @@ var makeClientPacket = () => {
 // Function to make an array of client objects
 var clientArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 5000; i ++) {
+  for (var i = 0; i < 15000; i ++) {
     results.push(makeClientPacket())
   }
   return results;
@@ -87,7 +88,7 @@ var makeOrderObject = () => {
 // Function to make an array of client objects
 var orderArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 1000; i ++) {
+  for (var i = 0; i < 10000; i ++) {
     results.push(makeOrderObject())
   }
   return results;
