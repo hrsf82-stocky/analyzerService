@@ -155,8 +155,9 @@ const insertProfitPackets = (records)=> {
 // If receiving message from CLIENT QUEUE
 const insertClientData = (data) => {
     // Identify the user_id from body
-    var number = data.attributes.user_id;
-    var actions = data.body.payload;
+    console.log(data)
+    var number = data.Attributes.user_id;
+    var actions = data.Body.payload;
     var userId;
     var total_sessions;
 

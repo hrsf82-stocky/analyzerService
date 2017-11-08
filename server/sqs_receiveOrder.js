@@ -29,7 +29,7 @@ const getMessages = () => {
     }
   })
   .then((results) => {
-    database.insertOrderData(results);    
+    database.insertOrderData(results.Messages[0]);    
 
     var deleteParams = {
       QueueUrl: queueURL,

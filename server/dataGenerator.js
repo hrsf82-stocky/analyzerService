@@ -6,17 +6,19 @@ const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
 const Promise = require('bluebird');
-
+const userNumbers = () => { var results = []; for (var i = 0; i < 100000; i ++) { 
+      results.push(faker.random.number({min:10000000, max:99999999})) } return results; }
+const userArray = userNumbers();
 const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
 const indicatorTypes = ['MACD', 'EMA', 'MA', 'SMA', 'Bollinger', 'Fibonacci'];
 const majorPairTypes = ['EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY', 
                         'EURGBP', 'EURCHF', 'AUDUSD', 'EURJPY', 'GBPJPY'];
 
 // SAMPLE FROM CLIENT
-// var body = {payload: [ { majorPair: ‘EURUSD’, interval: ‘5s’, indicator: ‘MACD’ } , 
+// var Body = {payload: [ { majorPair: ‘EURUSD’, interval: ‘5s’, indicator: ‘MACD’ } , 
 //   { majorPair: ‘USDGBP’, interval: ‘5s’, indicator: ‘MACD’ } , 
 //   { majorPair: ‘USDGBP’, interval: ‘1h’, indicator: ‘EMA’ }  ]};
-// var attributes = {
+// var Attributes = {
 //     session_id: 123456789,
 //     user_id: 12345678
 // }
@@ -49,10 +51,10 @@ var makePayload = () => {
 // Function to wrap those in the body property 
 var makeClientPacket = () => {
   var object = {
-    body : { payload : makePayload() },
-    attributes : {
+    Body : { payload : makePayload() },
+    Attributes : {
         session_id: 123456789,
-        user_id: faker.random.number({min:10000000, max:99999999})
+        user_id: userArray[Math.floor(Math.random() * userArray.length)]
       }
   };
   return object;
@@ -61,7 +63,7 @@ var makeClientPacket = () => {
 // Function to make an array of client objects
 var clientArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 10; i ++) {
+  for (var i = 0; i < 5000; i ++) {
     results.push(makeClientPacket())
   }
   return results;
@@ -85,7 +87,7 @@ var makeOrderObject = () => {
 // Function to make an array of client objects
 var orderArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 10; i ++) {
+  for (var i = 0; i < 1000; i ++) {
     results.push(makeOrderObject())
   }
   return results;
@@ -97,28 +99,6 @@ var orderArrayMaker = () => {
 // **************** INSERT INTO DATABASE ****************
 // ====================================================== 
 
-// PROMISE REDUCE EXAMPLE:
-https://stackoverflow.com/questions/24660096/correct-way-to-write-loops-for-promise
-
-// let asyncFn = (item) => {
-//   return new Promise((resolve, reject) => {
-//     setTimeout( () => {console.log(item); resolve(true)}, 1000 )
-//   })
-// }
-
-// asyncFn('a')
-// .then(()=>{return async('b')})
-// .then(()=>{return async('c')})
-// .then(()=>{return async('d')})
-
-// let a = ['a','b','c','d']
-
-// a.reduce((previous, current, index, array) => {
-//   return previous                                    // initiates the promise chain
-//   .then(()=>{return asyncFn(array[index])})      //adds .then() promise for each item
-// }, Promise.resolve())
-
-
 // INSERT CLIENT DATA FUNCTION WITH PROMISE REDUCE
 var bulkClientInsert = () => {
   var list = clientArrayMaker();
@@ -128,7 +108,7 @@ var bulkClientInsert = () => {
   }, Promise.resolve())
 }
 
-// bulkClientInsert();
+bulkClientInsert();
 
 // INSERT ORDER DATA FUNCTION WITH PROMISE REDUCE
 var bulkOrderInsert = () => {

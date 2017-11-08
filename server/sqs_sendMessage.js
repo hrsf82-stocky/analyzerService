@@ -1,12 +1,17 @@
-'use strict';
+// ====================================================== 
+// ************* RECEIVE FROM ORDER QUEUE ***************
+// ====================================================== 
+
+/* !!! The analyzer service does not need to send any messages to the
+AWS message bus. This page was created for testing !!!*/
+
 const fs = require('fs');
 const AWS = require('aws-sdk');
-AWS.config.loadFromPath('./config.json');
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-
+const queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+AWS.config.loadFromPath('./config.json');
 sqs.config.setPromisesDependency(require('bluebird'));
 
-var queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
 
 var params = {
   DelaySeconds: 0,
