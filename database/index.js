@@ -1,8 +1,9 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-AWS.config.loadFromPath('./config.json');
 sqs.config.setPromisesDependency(require('bluebird'));
+AWS.config.loadFromPath('./config.json');
+
 
 // ====================================================== 
 // ************** SEQUELIZE SETUP AND INIT **************
@@ -162,7 +163,7 @@ const insertClientData = (data) => {
     var total_sessions;
 
     // Check if it exists in user table (findOrCreate)
-    User.findOrCreate({where: {user_number: number}, defaults: {total_sessions: 0}})
+    User.findOrCreate({where: {user_number: number}, defaults: {total_sessions: 1}})
     .spread((user, created) => {
         userId = user.dataValues.id;
         total_sessions = user.dataValues.total_sessions + 1;
@@ -217,9 +218,13 @@ var order = { userId: '12345678', profit: '100', pair: 'EURUSD' }
 // If receiving message from ORDER QUEUE
 const insertOrderData = (order) => {
     // Identify the user_id from body
+    // var order = JSON.parse(order);
+
     var userNumber = order.userId;
     var pair = order.pair;
     var profit = order.profit;
+    // console.log(JSON.parse(order))
+    console.log("OOOOOOOOOOOOOOO: ",userNumber, pair,profit)
     var userId;
     // console.log("$$$$$$$$$$: ", profit)
     // Get the row id of that user from user table
@@ -227,10 +232,10 @@ const insertOrderData = (order) => {
     .then((results) => {
         // console.log("RESULTSSSSSSSSS: ", results[0].dataValues);
         userId = results[0].dataValues.id;
-        console.log(pair)
+        console.log("PAIRRRRRRRRRRRR1111111111: ", pair)
         Pair.findOne({where: {currency_pair: pair}})
         .then((pair) => {
-            console.log("PAIRRRRRRRRRRRR: ",pair);
+            console.log("PAIRRRRRRRRRRRR222222222: ",pair);
             // Identify the currency patir 
             pairId = pair.dataValues.id;
             console.log("PAIR ID >>>>>>>>>>>>>>: ", pairId)            

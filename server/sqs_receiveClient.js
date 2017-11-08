@@ -8,6 +8,7 @@ const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 const queueURL = "https://sqs.us-west-1.amazonaws.com/481569304347/sessioninfo";
 AWS.config.loadFromPath('./config.json');
+
 sqs.config.setPromisesDependency(require('bluebird'));
 
 const params = {

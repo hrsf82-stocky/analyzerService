@@ -5,9 +5,10 @@
 const database = require('../database/index.js');
 const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-const queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+const queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/FulfilledOrderQueue";
 
 AWS.config.loadFromPath('./config.json');
+
 sqs.config.setPromisesDependency(require('bluebird'));
 
 var params = {
@@ -29,7 +30,8 @@ const getMessages = () => {
     }
   })
   .then((results) => {
-    database.insertOrderData(results.Messages[0]);    
+    console.log("RESULTSSSSSSSSSS: ", results.Messages[0].Body)
+    database.insertOrderData(JSON.parse(results.Messages[0].Body));    
 
     var deleteParams = {
       QueueUrl: queueURL,
