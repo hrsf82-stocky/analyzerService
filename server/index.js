@@ -1,8 +1,10 @@
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
-const db = require('../database/index.js');
+const database = require('../database/index.js');
 const app = express();
-
+const receiveClient = require('./sqs_receiveClient.js')
+const receiveOrder = require('./sqs_receiveOrder.js')
 
 // ====================================================== 
 // ********************* AWS SETUP **********************
@@ -16,48 +18,22 @@ AWS.config.loadFromPath('./config.json');
 
 // Create an SQS service object
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+sqs.config.setPromisesDependency(require('bluebird'));
 
-sqs.listQueues(params, function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else {
-    console.log("Success", data.QueueUrls);
-  }
-});
+const queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+let params = {};
 
-var queueURL = "https://sqs.us-west-1.amazonaws.com/858778373274/analyzerservice";
+// ====================================================== 
+// ******************* SEVER METHODS ********************
+// ====================================================== 
 
-var params = {
- AttributeNames: [
-    "SentTimestamp"
- ],
- MaxNumberOfMessages: 1,
- MessageAttributeNames: [
-    "All"
- ],
- QueueUrl: queueURL,
- VisibilityTimeout: 0,
- WaitTimeSeconds: 0
-};
+sqs.listQueues(params).promise()
+  .then((results) => console.log("DONE!", results.QueueUrls))
+  .catch((error) => console.log("ERROR", error))
 
-// sqs.receiveMessage(params, function(err, data) {
-//   if (err) {
-//     console.log("Receive Error", err);
-//   } else {
-//     var deleteParams = {
-//       QueueUrl: queueURL,
-//       ReceiptHandle: data.Messages[0].ReceiptHandle
-//     };
-//     sqs.deleteMessage(deleteParams, function(err, data) {
-//       if (err) {
-//         console.log("Delete Error", err);
-//       } else {
-//         console.log("Message Deleted", data);
-//       }
-//     });
-//   }
-// });
+receiveClient.getMessages()
 
+receiveOrder.getMessages()
 
 // ====================================================== 
 // ****************** LOCAL HOST SETUP ******************
