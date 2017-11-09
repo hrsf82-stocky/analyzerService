@@ -6,7 +6,6 @@ WORKDIR /app
 
 #Copy the compiled source and config files
 ADD . /app
-ADD config.js /app
 ADD package.json /app
 
 #Install dependencies

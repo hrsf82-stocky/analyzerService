@@ -4,12 +4,12 @@ const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 sqs.config.setPromisesDependency(require('bluebird'));
 AWS.config.loadFromPath('./config.json');
 
-
 // ====================================================== 
 // ************** SEQUELIZE SETUP AND INIT **************
 // ====================================================== 
 
 const Sequelize = require('sequelize');
+
 const sequelize = new Sequelize('stocky3', 'stephaniewong', '', {
   host: '127.0.0.1',
   dialect: 'postgres',
@@ -163,7 +163,7 @@ const insertClientData = (data) => {
     var total_sessions;
 
     // Check if it exists in user table (findOrCreate)
-    User.findOrCreate({where: {user_number: number}, defaults: {total_sessions: 1}})
+    return User.findOrCreate({where: {user_number: number}, defaults: {total_sessions: 1}})
     .spread((user, created) => {
         userId = user.dataValues.id;
         total_sessions = user.dataValues.total_sessions + 1;
@@ -228,7 +228,7 @@ const insertOrderData = (order) => {
     var userId;
     // console.log("$$$$$$$$$$: ", profit)
     // Get the row id of that user from user table
-    User.findOrCreate({where: {user_number: userNumber}, defaults: {total_sessions: 1}})
+    return User.findOrCreate({where: {user_number: userNumber}, defaults: {total_sessions: 1}})
     .then((results) => {
         // console.log("RESULTSSSSSSSSS: ", results[0].dataValues);
         userId = results[0].dataValues.id;

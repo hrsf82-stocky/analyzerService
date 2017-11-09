@@ -6,8 +6,9 @@ const database = require('../database/index.js');
 const faker = require('faker');
 const PD = require("probability-distributions");
 const Promise = require('bluebird');
-const userNumbers = () => { var results = []; for (var i = 0; i < 10000; i ++) { 
-      results.push(faker.random.number({min:79990000, max:80000000})) } return results; }
+const userNumbers = () => { var results = []; for (var i = 10000000; i <= 10025000; i ++) { 
+      results.push(i) } return results; }
+      // results.push(faker.random.number({min:79990000, max:80000000})) } return results; }
 const userArray = userNumbers();
 // console.log(userArray)
 const intervalTypes = ['5s', '1', '30', '1h', '1d', '1m'];
@@ -64,7 +65,7 @@ var makeClientPacket = () => {
 // Function to make an array of client objects
 var clientArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 15000; i ++) {
+  for (var i = 0; i < 500; i ++) {
     results.push(makeClientPacket())
   }
   return results;
@@ -79,7 +80,7 @@ var clientArrayMaker = () => {
 // Function to make { userId: INT, profit: FLOAT, pair: STRING } with random values
 var makeOrderObject = () => {
   var object = {};
-  object.userId = faker.random.number({min:10000000, max:99999999});
+  object.userId = userArray[Math.floor(Math.random() * userArray.length)];
   object.profit = faker.random.number({min:-200, max:500});
   object.pair = majorPairTypes[Math.floor(Math.random() * majorPairTypes.length)];
   return object;
@@ -88,7 +89,7 @@ var makeOrderObject = () => {
 // Function to make an array of client objects
 var orderArrayMaker = () => {
   var results = [];
-  for (var i = 0; i < 10000; i ++) {
+  for (var i = 0; i < 500; i ++) {
     results.push(makeOrderObject())
   }
   return results;
@@ -102,22 +103,47 @@ var orderArrayMaker = () => {
 
 // INSERT CLIENT DATA FUNCTION WITH PROMISE REDUCE
 var bulkClientInsert = () => {
+  console.time('clientInsert')
   var list = clientArrayMaker();
+  console.log(list[0].Body.payload)
   list.reduce((previous, current, index, array) => {
     return previous                                    // initiates the promise chain
     .then(()=>{return database.insertClientData(array[index])})      //adds .then() promise for each item
   }, Promise.resolve())
+  .then(() => {
+    console.timeEnd('clientInsert')
+    console.log('DONE')
+  })
 }
 
 bulkClientInsert();
 
 // INSERT ORDER DATA FUNCTION WITH PROMISE REDUCE
 var bulkOrderInsert = () => {
+  console.time('orderInsert')
   var list = orderArrayMaker();
   list.reduce((previous, current, index, array) => {
     return previous                                    // initiates the promise chain
     .then(()=>{return database.insertOrderData(array[index])})      //adds .then() promise for each item
   }, Promise.resolve())
+  .then(() => {
+    console.timeEnd('orderInsert')
+    console.log('DONE')
+  })
 }
 
 bulkOrderInsert();
+
+// UPDATE OR CREATE STATS
+// clientInsert: 598207.213ms
+  // 10,000 client + 10,000 order = 20,000 lines
+// clientInsert: 51393.045ms
+  // 2,000 lines
+// clientInsert: 25440.783ms
+  // 1,000 lines
+
+
+// BULK CREATE STATS
+// clientInsert: 531.874ms
+  // 1,000 lines
+
